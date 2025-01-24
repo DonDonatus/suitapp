@@ -9,6 +9,7 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  secrets: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/Register",
   },
