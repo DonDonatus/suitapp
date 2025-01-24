@@ -6,13 +6,13 @@ export async function POST(req) {
   const { fullname, email } = body;
 
   try {
-    const genCode = randomInt(1000, 9999);
+    const genCode = randomInt(1000, 999999);
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL, // Your Gmail email address
-        pass: process.env.PASSWORD, // App password for Gmail
+        user: process.env.EMAIL,
+        pass: process.env.PASSWORD,
       },
     });
 
@@ -20,7 +20,9 @@ export async function POST(req) {
       from: `SuitApp <obliepius13@gmail.com>`,
       to: email,
       subject: "Verification Code",
-      text: `Hello ${fullname}, your verification code is: ${genCode}`,
+      text: `Hello ${fullname}, your verification code is: ${genCode} 
+      please enter this code to verify your email address.
+      if you did not request this code, please ignore this email.`,
     };
 
     const info = await transporter.sendMail(mailOptions);
