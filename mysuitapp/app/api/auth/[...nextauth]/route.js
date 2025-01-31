@@ -10,11 +10,6 @@ export const authOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  callbacks: {
-    async redirect(url, baseUrl) {
-      return baseUrl;
-    },
-  },
   secrets: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/Register",

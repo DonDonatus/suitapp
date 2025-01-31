@@ -5,8 +5,11 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
 
 const Login = () => {
+  const router = useRouter();
   return (
     <div className="h-[65vh] lg:h-[70vh] w-full text-black bg-[#fafafa] flex   items-end lg:items-start  ">
       {/* Image container */}
@@ -43,7 +46,12 @@ const Login = () => {
             className="w-[70%] p-2 mb-4 border border-black rounded-[5px] focus:outline-none focus:border-black"
           />
 
-          <button className="w-[70%] p-2 bg-[#4c6474] text-white rounded-lg hover:bg-gray-800 active:scale-95 transition-all my-2">
+          <button className="w-[70%] p-2 bg-[#4c6474] text-white rounded-lg hover:bg-gray-800 active:scale-95 transition-all my-2"onClick={
+            () => {
+              router.push("/homepage");
+            }
+            
+          }>
             Sign in
           </button>
         </form>
