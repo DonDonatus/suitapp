@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
@@ -8,6 +8,9 @@ import { faUserTie } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 
 const Page = () => {
+  const router = useRouter();
+
+  // State variables
   const [email, setEmail] = useState("");
   const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +18,30 @@ const Page = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter(); // Initialize router
+  const [showPassword, setShowPassword] = useState(password);
+  const [borderColor, setBorderColor] = useState("border-black");
+  const [hasTypedPassword, setHasTypedPassword] = useState(false);
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setHasTypedPassword(true);
+  };
+
+  useEffect(() => {
+    if (!hasTypedPassword) return; // Skip validation if user hasn't typed anything
+
+    if (password.length > 8 && /[A-Z]/.test(password) && /\d/.test(password)) {
+      setBorderColor("border-green-600");
+      setError("");
+      return;
+    } else {
+      setError(
+        "Password must be at least 8 characters long.\n It must contain at least one uppercase and a number."
+      );
+      setBorderColor("border-red-600");
+      setLoading(false);
+    }
+  }, [password]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +49,12 @@ const Page = () => {
     setSuccess(""); // Reset success message
     setLoading(true); // Show loading indicator
 
-    // Validation
+    const userData = {
+      email,
+      fullname,
+      password,
+    };
+
     if (!fullname || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       setLoading(false);
@@ -31,30 +62,24 @@ const Page = () => {
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match!");
+      setError("Passwords do not match.");
       setLoading(false);
       return;
     }
 
-    const userData = {
-      email,
-      fullname,
-      password,
-    };
-
     try {
       // Send the request to create an account
       await axios.post("/api/users", userData);
-      await axios.post("/api/email", userData);
       setFullname("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
 
       // Redirect to the verification page after 2 seconds
-      setTimeout(() => {
-        router.push("/Verification");
-      }, 2000);
+      setSuccess(
+        "Account created successfully. Redirecting to verification page..."
+      );
+      router.push(`/Verification?email=${encodeURIComponent(email)}`);
     } catch (error) {
       setError(error.response?.data?.message || "Something went wrong.");
       setLoading(false);
@@ -101,14 +126,14 @@ const Page = () => {
             type="password"
             placeholder="Password"
             required
-            className="w-[70%] p-2 mb-4 border border-black rounded-[5px] focus:outline-none focus:border-black"
-            onChange={(e) => setPassword(e.target.value)}
+            className={`w-[70%] p-2 mb-4 border border-black rounded-[5px] focus:outline-none focus:${borderColor} ${borderColor}`}
+            onChange={handlePasswordChange}
           />
           <input
             type="password"
             placeholder="Confirm Password"
             required
-            className="w-[70%] p-2 mb-4 border border-black rounded-[5px] focus:outline-none focus:border-black"
+            className={`w-[70%] p-2 mb-4 border border-black rounded-[5px] focus:outline-none focus:border-black`}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           <button
@@ -125,7 +150,13 @@ const Page = () => {
               "Sign Up"
             )}
           </button>
-          {error && <p className="text-red-600">{error}</p>}
+          {error && (
+            <p
+              className="text-red-500 whitespace-pre-line text-center"
+              dangerouslySetInnerHTML={{ __html: error }}
+            />
+          )}
+
           {success && <p className="text-orange-600">{success}</p>}
         </form>
         <p className="text-gray-600 text-sm mt-2">
