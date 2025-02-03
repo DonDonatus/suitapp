@@ -22,4 +22,4 @@ const page = () => {
   return <div className="text-black">Homepage</div>;
 };
 
-export default page;
+export default page
